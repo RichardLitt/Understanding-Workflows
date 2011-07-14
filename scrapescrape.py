@@ -25,48 +25,48 @@ for line in file.readlines():
 	bs = BeautifulSoup(rawhtml)
 	
 
-	#Print the workflow address on myExperiment
-	#print "\"" + line.strip() + "\",", 
+	#print the workflow address on myExperiment
+	print "\"" + line.strip() + "\",", 
 	output.write("\"" + line.strip() + "\",",)
 	
-	#Print the link to the .svg image
-	#print "\"" + line.strip() + "/versions/1/previews/full\",", 
+	#print the link to the .svg image
+	print "\"" + line.strip() + "/versions/1/previews/full\",", 
 	output.write("\"" + line.strip() + "/versions/1/previews/full\",",)
 
     # Get the title
 	title_obj = bs.find("h1", {"class": "contribution_title"})
 	title = title_obj.contents[0].replace("Workflow Entry: ","").encode('ascii', 'ignore')
-	#print "\"" + title.strip() + "\",",
+	print "\"" + title.strip() + "\",",
 	output.write("\"" + title.strip() + "\",",)
 	
 	# Get the dates
 	date_obj = bs.find("div", {"class": "contribution_aftertitle"})
 	date_created = date_obj.contents[1].replace(" ","")
 	date_created = date_created.replace("&nbsp;","")
-	#print "\"" + date_created.strip() + "\",", 
+	print "\"" + date_created.strip() + "\",", 
 	output.write("\"" + date_created.strip() + "\",", )
 	date_updated = ""
 	if len(date_obj.contents) == 4:
 		date_updated = date_obj.contents[3].replace(" ","")
-	#print "\"" + date_updated.strip() + "\",",
+	print "\"" + date_updated.strip() + "\",",
 	output.write("\"" + date_updated.strip() + "\",",)
 	
 	#Get the amount of versions
 	vers_obj = bs.find("td", {"class": "heading"}).findAll("span")[1]
 	version = vers_obj.contents[0].replace("(of ", "").replace(")", "")
-	#print "\"" + version + "\",", 
+	print "\"" + version + "\",", 
 	output.write("\"" + version + "\",", )
 
 	# Get the author
 	author_obj = bs.findAll("div", {"class": "contribution_section_box"})[1].find("a")
 	author = author_obj['href']
-	#print "\"" + author.strip() + "\",",
+	print "\"" + author.strip() + "\",",
 	output.write("\"" + author.strip() + "\",",)
 	
 	# Get the workflow system type
 	type_obj = bs.findAll("div", {"class": "contribution_section_box"})[0].find("a")
 	wftype = type_obj.contents[0]
-	#print "\"" + wftype.strip() + "\",", 
+	print "\"" + wftype.strip() + "\",", 
 	output.write("\"" + wftype.strip() + "\",", )
 	
 	# Get the natural language description
@@ -86,18 +86,18 @@ for line in file.readlines():
 	tags = ""
 	for i in tags_obj:
 		tags += i.contents[0] + ", "
-	#print "\"" + tags[:-2].strip() +"\",",
+	print "\"" + tags[:-2].strip() +"\",",
 	output.write("\"" + tags[:-2].strip() + "\",",)
 	
 	#Get the viewings
 	stats_obj = bs.find("div", {"class": "stats_box"}).findAll("p")
 	viewings = stats_obj[0].contents[0].replace(" viewings", "")
-	#print "\"" + viewings.strip() + "\",",  #Viewings
+	print "\"" + viewings.strip() + "\",",  #Viewings
 	output.write("\"" + viewings.strip() + "\",",)
 	
 	#Get the downloads
 	downloads = stats_obj[1].contents[0].replace(" downloads", "")
-	#print "\"" + downloads.strip() + "\",", #Downloads
+	print "\"" + downloads.strip() + "\",", #Downloads
 	output.write("\"" + downloads.strip() + "\",",)
 	
 	#Get the more section
@@ -106,7 +106,7 @@ for line in file.readlines():
 		v = x.contents[0]
 		match_o = re.match(number_regex,v)
 		if (match_o != None):
-		#print "\"" + match_o.group(0) + "\",",
+			print "\"" + match_o.group(0) + "\",",
 			output.write("\"" + match_o.group(0) + "\",",)
 
 	if (sys.argv[2] == "taverna_1")	or (sys.argv[2] == "taverna_2") or (sys.argv[2] == "rapidminer"):
@@ -127,7 +127,6 @@ for line in file.readlines():
 		for x in others_con:
 			others_b = x.findAll("tr")
 			t.append(others_b)
-		print t
 		
 		if (sys.argv[2] == "rapidminer"):
 			#Get the names of the operators
@@ -136,7 +135,7 @@ for line in file.readlines():
 				op_name = x.find("td")
 				if (op_name != None):
 					op_names += op_name.contents[0].encode('ascii', 'ignore') + ", "
-			#print "\"" + op_names + "\",",
+			print "\"" + op_names + "\",",
 			output.write("\"" + op_names + "\",",)
 	
 			#Get the names of the outputs
@@ -145,7 +144,7 @@ for line in file.readlines():
 				output_name = x.find("b")
 				if (output_name != None):
 					output_names += output_name.contents[0] + ", "
-			#print "\"" + output_names + "\",",
+			print "\"" + output_names + "\",",
 			output.write("\"" + output_names + "\",",)		
 		
 		if (sys.argv[2] == "taverna_1")	or (sys.argv[2] == "taverna_2"):
@@ -161,7 +160,7 @@ for line in file.readlines():
 					input_name = x.find("b")
 					if (input_name != None):
 						input_names += input_name.contents[0] + ", "
-				#print "\"" + input_names + "\",",
+				print "\"" + input_names + "\",",
 				output.write("\"" + input_names + "\",",)
 			
 				#Get the processor names
@@ -175,7 +174,7 @@ for line in file.readlines():
 					proc_name = x.find("b")
 					if (proc_name != None):
 						proc_names += proc_name.contents[0] + ", "
-				#print "\"" + proc_names + "\",",
+				print "\"" + proc_names + "\",",
 				output.write("\"" + proc_names + "\",",)
 			
 				#Get the embedded workflow names, amount, and description
@@ -220,7 +219,7 @@ for line in file.readlines():
 					match_wf = re.search("bean",str(wf_name[1]))
 					if (match_wf != None):
 					 	beanshell[0] += 1
-					match_wf = re.search("wsdl",str(wf_name[1]))
+					match_wf = re.searchprint
 					if (match_wf != None):
 			 			wsdl[0] += 1
 			 		match_wf = re.search("xmlsplitter",str(wf_name[1]))
@@ -247,10 +246,19 @@ for line in file.readlines():
 			 	workflow = str(workflow[0])
 			 	soaplab = str(soaplab[0])
 			 	bio = str(bio[0])
-				#print count, wf_names, wf_descrip
-				#print "\"" + count + "\",",
-				#print "\"" + wf_names + "\",",
-				#print "\"" + wf_descrip + "\",",
+
+				print "\"" + count + "\",",
+				print "\"" + wf_names + "\",",
+				print "\"" + wf_descrip + "\",",
+				print "\"" + localworker + "\",",
+				print "\"" + stringconstant + "\",",
+				print "\"" + beanshell + "\",",
+				print "\"" + wsdl + "\",",
+				print "\"" + xmlsplitter + "\",",
+				print "\"" + workflow + "\",",
+				print "\"" + soaplab + "\",",
+				print "\"" + bio + "\",",
+				
 				output.write("\"" + wf_names + "\",",)
 				output.write("\"" + wf_descrip + "\",",)
 				output.write("\"" + count + "\",",)
@@ -274,7 +282,7 @@ for line in file.readlines():
 					bn_name = x.find("b")
 					if (bn_name != None):
 						bn_names += bn_name.contents[0] + ", "
-				#print "\"" + bn_names + "\",",
+				print "\"" + bn_names + "\",",
 				output.write("\"" + bn_names + "\",",)
 				
 				#Get the names of the outputs
@@ -287,7 +295,7 @@ for line in file.readlines():
 					output_name = x.find("b")
 					if (output_name != None):
 						output_names += output_name.contents[0] + ", "
-				#print "\"" + output_names + "\",",
+				print "\"" + output_names + "\",",
 				output.write("\"" + output_names + "\",",)	
 			except:
 				print 
