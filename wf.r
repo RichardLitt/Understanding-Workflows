@@ -1,0 +1,636 @@
+# -------------------------------------------------------------------------------------
+# An R script to read (modify if you like), analyze and plot data from MySQL tables.
+# Specifically, this script reads data screen scraped from myExperiment.
+# Created by Karthik R. and Richard L. 
+
+# -------------------------------------------------------------------------------------
+# LOADING LIBRARIES & SETTING WORKING DIRECTORY
+# We'll use RMySQL to query the data & ggplot (see http://had.co.nz/ggplot2/ for examples)
+# Type in install.packages('RMySQL') to install if you don't have it
+# If you don't have ggplot, then run a similar command. install.packages('ggplot2')
+
+library(RMySQL)
+library(ggplot2) 
+
+# Set a working directory so all files, especially results and figures are in Dropbox.
+
+setwd("~/Dropbox/DataOne Workflows/DataONE_R/Graphs")
+
+# -------------------------------------------------------------------------------------
+# CONNECTING TO THE DATABASE
+
+# Next, we'll connect to the database. Pretty self-explanatory.
+# Here, I am connecting to my local SQL server, hosted by MAMP.
+con<-dbConnect(MySQL(),user="root",password="root",dbname="myExperiment",host="127.0.0.1",port=8889)
+table_list=dbGetQuery(con,"show tables")
+table_list
+
+# To find which directory files are saved to, type:
+getwd()
+# -------------------------------------------------------------------------------------
+
+# NOW TO RUN THE QUERIES
+# What follows are a few simple examples to get you started.
+
+# First we'll ask the database to return a list of tables.
+table_list=dbGetQuery(con,"show tables")
+
+
+table_list # should show you that there is one table right now.
+
+# If you are unfamiliar with R, table_list is now what is called a 'Data Frame'. Data read from CSVs or Excel also go into dataframes. Dataframes can be queried, joined, or grouped into lists.
+
+# Type in str(table_list) to see its structure in R.
+
+
+# Now let's look at the structure of the taverna_2 table
+
+dbGetQuery(con,"describe taverna_2")
+
+# Next, we'll write a really simple query. 
+
+dataset_1=dbGetQuery(con,"select Category,C1 from taverna_2 where C1>1000")
+
+# To save this result into a local csv file
+write.csv(dataset_1, file = "dataset_1.csv")
+
+names(dataset_1) # shows you the names of the columns. Best to avoid periods in column names in the databsase. Use _ instead.
+dim(dataset_1) # shows you how many rows and columns resulted from that query
+head(dataset_1) # shows you the top few rows
+tail(dataset_1) # shows you the bottom few.
+
+# Now let's make a simple plot with this
+
+ggplot(dataset_1,aes(Category,C1)) + geom_point()
+
+# To save this plot as a jpg, first assign it to a variable
+plot_1=ggplot(dataset_1,aes(Category,C1)) + geom_point()
+# then save that variable into any format you like for blogging, publication or further editing
+ggsave(plot_1,file="first_plot.png") #Use jpg,pdf, or eps to save in such a format
+
+# -------------------------------------------------------------------------------------
+# A few more example queries
+# See here for some tips: http://www.mysqltutorial.org/mysql-select-statement-query-data.aspx
+dataset_1=dbGetQuery(con,"select distinct Category from taverna_2 where C1>1000")
+
+
+# -------------------------------------------------------------------------------------
+# Specific plots
+
+# -----------------------------------
+# Downloads vs. Views
+
+# Taverna 2
+data=dbGetQuery(con,"select Views,Downloads from taverna_2")
+ggplot(data,aes(Downloads,Views)) +geom_point() +geom_smooth(method=lm)
+file = ggplot(data,aes(Downloads,Views)) +geom_point() +geom_smooth(method=lm)
+ggsave(file,file="t2_views_downloads.png")
+
+# Taverna 1
+data=dbGetQuery(con,"select Views,Downloads from taverna_1")
+ggplot(data,aes(Downloads,Views)) +geom_point() +geom_smooth(method=lm)
+file = ggplot(data,aes(Downloads,Views)) +geom_point() +geom_smooth(method=lm)
+ggsave(file,file="t1_views_downloads.png")
+
+#RapidMiner
+data=dbGetQuery(con,"select Views,Downloads from rapidminer")
+ggplot(data,aes(Downloads,Views)) +geom_point() +geom_smooth(method=lm)
+file = ggplot(data,aes(Downloads,Views)) +geom_point() +geom_smooth(method=lm)
+ggsave(file,file="rm_views_downloads.png")
+
+#Others
+data=dbGetQuery(con,"select Views,Downloads from others")
+ggplot(data,aes(Downloads,Views)) +geom_point() +geom_smooth(method=lm)
+file = ggplot(data,aes(Downloads,Views)) +geom_point() +geom_smooth(method=lm)
+ggsave(file,file="o_views_downloads.png")
+
+
+# -----------------------------------
+# Tags vs. Downloads
+
+# Taverna 2
+data=dbGetQuery(con,"select Downloads,Number_Tags from taverna_2")
+ggplot(data,aes(Downloads,Number_Tags)) +geom_point() +geom_smooth(method=lm)
+file = ggplot(data,aes(Downloads,Number_Tags)) +geom_point() +geom_smooth(method=lm)
+ggsave(file,file="t2_num_tags_downloads.png")
+
+# Taverna 1
+data=dbGetQuery(con,"select Downloads,Number_Tags from taverna_1")
+ggplot(data,aes(Downloads,Number_Tags)) +geom_point() +geom_smooth(method=lm)
+file = ggplot(data,aes(Downloads,Number_Tags)) +geom_point() +geom_smooth(method=lm)
+ggsave(file,file="t1_num_tags_downloads.png")
+
+#Rapidminer
+data=dbGetQuery(con,"select Downloads,Number_Tags from rapidminer")
+ggplot(data,aes(Downloads,Number_Tags)) +geom_point() +geom_smooth(method=lm)
+file = ggplot(data,aes(Downloads,Number_Tags)) +geom_point() +geom_smooth(method=lm)
+ggsave(file,file="rm_num_tags_downloads.png")
+
+#Others
+data=dbGetQuery(con,"select Downloads,Number_Tags from others")
+ggplot(data,aes(Downloads,Number_Tags)) +geom_point() +geom_smooth(method=lm)
+file = ggplot(data,aes(Downloads,Number_Tags)) +geom_point() +geom_smooth(method=lm)
+ggsave(file,file="o_num_tags_downloads.png")
+
+# -----------------------------------
+# Bipcod vs. Downloads
+
+# Taverna 2
+data=dbGetQuery(con,"select Downloads,Beanshells,Inputs,Processors,Outputs,Datalinks,Coordinators from taverna_2")
+ggplot(data,aes(Downloads,Beanshells+Inputs+Processors+Outputs+Datalinks+Coordinators)) +geom_point() +geom_smooth(method=lm)
+file = ggplot(data,aes(Downloads,Beanshells+Inputs+Processors+Outputs+Datalinks+Coordinators)) +geom_point() +geom_smooth(method=lm)
+ggsave(file,file="t2_bipcod_downloads.png")
+
+#Taverna 1
+data=dbGetQuery(con,"select Downloads,Beanshells,Inputs,Processors,Outputs,Datalinks,Coordinators from taverna_1")
+ggplot(data,aes(Downloads,Beanshells+Inputs+Processors+Outputs+Datalinks+Coordinators)) +geom_point() +geom_smooth(method=lm)
+file = ggplot(data,aes(Downloads,Beanshells+Inputs+Processors+Outputs+Datalinks+Coordinators)) +geom_point() +geom_smooth(method=lm)
+ggsave(file,file="t1_bipcod_downloads.png")
+
+#Rapidminer
+data=dbGetQuery(con,"select Downloads,Beanshells,Inputs,Processors,Outputs,Datalinks,Coordinators from rapidminer")
+ggplot(data,aes(Downloads,Beanshells+Inputs+Processors+Outputs+Datalinks+Coordinators)) +geom_point() +geom_smooth(method=lm)
+file = ggplot(data,aes(Downloads,Beanshells+Inputs+Processors+Outputs+Datalinks+Coordinators)) +geom_point() +geom_smooth(method=lm)
+ggsave(file,file="rm_bipcod_downloads.png")
+
+#Others
+data=dbGetQuery(con,"select Downloads,Beanshells,Inputs,Processors,Outputs,Datalinks,Coordinators from others")
+ggplot(data,aes(Downloads,Beanshells+Inputs+Processors+Outputs+Datalinks+Coordinators)) +geom_point() +geom_smooth(method=lm)
+file = ggplot(data,aes(Downloads,Beanshells+Inputs+Processors+Outputs+Datalinks+Coordinators)) +geom_point() +geom_smooth(method=lm)
+ggsave(file,file="o_bipcod_downloads.png")
+
+
+# -----------------------------------
+# Versions vs. Downloads
+
+# Should also probably be a different type of graph
+
+# Taverna 2
+data=dbGetQuery(con,"select Downloads,Versions from taverna_2")
+ggplot(data,aes(Downloads,Versions)) +geom_point() +geom_smooth(method=lm)
+file = ggplot(data,aes(Downloads,Versions)) +geom_point() +geom_smooth(method=lm)
+ggsave(file,file="t2_versions_downloads.png")
+
+#Taverna 1
+data=dbGetQuery(con,"select Downloads,Versions from taverna_1")
+ggplot(data,aes(Downloads,Versions)) +geom_point() +geom_smooth(method=lm)
+file = ggplot(data,aes(Downloads,Versions)) +geom_point() +geom_smooth(method=lm)
+ggsave(file,file="t1_versions_downloads.png")
+
+# Rapidminer and Others only have one version each.
+
+# -----------------------------------
+# Length of description against amount of downloads
+#
+# Taverna 2
+data=dbGetQuery(con,"select Description,Downloads from taverna_2")
+ggplot(data,aes(Downloads,nchar(Description))) +geom_point() +geom_smooth(method=lm)
+file = ggplot(data,aes(Downloads,nchar(Description))) +geom_point() +geom_smooth(method=lm)
+ggsave(file,file="t2_description_len_downloads.png")
+	
+# Taverna 1
+data=dbGetQuery(con,"select Description,Downloads from taverna_1")
+ggplot(data,aes(Downloads,nchar(Description))) +geom_point() +geom_smooth(method=lm)
+file = ggplot(data,aes(Downloads,nchar(Description))) +geom_point() +geom_smooth(method=lm)
+ggsave(file,file="t1_description_len_downloads.png")
+
+# RapidMiner
+data=dbGetQuery(con,"select Description,Downloads from rapidminer")
+ggplot(data,aes(Downloads,nchar(Description))) +geom_point() +geom_smooth(method=lm)
+file = ggplot(data,aes(Downloads,nchar(Description))) +geom_point() +geom_smooth(method=lm)
+ggsave(file,file="rm_description_len_downloads.png")
+
+# Others
+data=dbGetQuery(con,"select Description,Downloads from others")
+ggplot(data,aes(Downloads,nchar(Description))) +geom_point() +geom_smooth(method=lm)
+file = ggplot(data,aes(Downloads,nchar(Description))) +geom_point() +geom_smooth(method=lm)
+ggsave(file,file="o_description_len_downloads.png")
+
+
+# -----------------------------------
+# Length of title against amount of downloads
+#
+# Taverna 2
+data=dbGetQuery(con,"select Title,Downloads from taverna_2")
+ggplot(data,aes(Downloads,nchar(Title))) +geom_point() +geom_smooth(method=lm)
+file = ggplot(data,aes(Downloads,nchar(Title))) +geom_point() +geom_smooth(method=lm)
+ggsave(file,file="t2_title_len_downloads.png")
+
+# Taverna 1
+data=dbGetQuery(con,"select Title,Downloads from taverna_1")
+ggplot(data,aes(Downloads,nchar(Title))) +geom_point() +geom_smooth(method=lm)
+file = ggplot(data,aes(Downloads,nchar(Title))) +geom_point() +geom_smooth(method=lm)
+ggsave(file,file="t1_title_len_downloads.png")
+
+#rapidminer
+data=dbGetQuery(con,"select Title,Downloads from rapidminer")
+ggplot(data,aes(Downloads,nchar(Title))) +geom_point() +geom_smooth(method=lm)
+file = ggplot(data,aes(Downloads,nchar(Title))) +geom_point() +geom_smooth(method=lm)
+ggsave(file,file="rm_title_len_downloads.png")
+
+# others
+data=dbGetQuery(con,"select Title,Downloads from others")
+ggplot(data,aes(Downloads,nchar(Title))) +geom_point() +geom_smooth(method=lm)
+file = ggplot(data,aes(Downloads,nchar(Title))) +geom_point() +geom_smooth(method=lm)
+ggsave(file,file="o_title_len_downloads.png")
+
+# -----------------------------------
+# Versions against views
+#
+# Taverna 2
+data=dbGetQuery(con,"select Views,Versions from taverna_2")
+ggplot(data,aes(Views,Versions)) +geom_point() +geom_smooth(method=lm)
+file = ggplot(data,aes(Views,Versions)) +geom_point() +geom_smooth(method=lm)
+ggsave(file,file="t2_views_versions.png")
+
+# Taverna 1
+data=dbGetQuery(con,"select Views,Versions from taverna_1")
+ggplot(data,aes(Views,Versions)) +geom_point() +geom_smooth(method=lm)
+file = ggplot(data,aes(Views,Versions)) +geom_point() +geom_smooth(method=lm)
+ggsave(file,file="t1_views_versions.png")
+
+# Rapidminer and Others only have one version each.
+
+# -----------------------------------
+# Favorites against downloads
+
+# Only five favourites at top favourited. 
+
+
+# Taverna 2
+data=dbGetQuery(con,"select Favs,Downloads from taverna_2")
+ggplot(data,aes(Favs,Downloads)) +geom_point() +geom_smooth(method=lm)
+file = ggplot(data,aes(Favs,Downloads)) +geom_point() +geom_smooth(method=lm)
+ggsave(file,file="t2_favs_downloads.png")
+
+# Taverna 1
+# Seems to have more favourites
+data=dbGetQuery(con,"select Favs,Downloads from taverna_1")
+ggplot(data,aes(Favs,Downloads)) +geom_point() +geom_smooth(method=lm)
+file = ggplot(data,aes(Favs,Downloads)) +geom_point() +geom_smooth(method=lm)
+ggsave(file,file="t1_favs_downloads.png")
+
+#No Favs for either rapidminer 
+
+# Rapidminer
+data=dbGetQuery(con,"select Favs,Downloads from rapidminer")
+ggplot(data,aes(Favs,Downloads)) +geom_point() +geom_smooth(method=lm)
+file = ggplot(data,aes(Favs,Downloads)) +geom_point() +geom_smooth(method=lm)
+ggsave(file,file="rm_favs_downloads.png")
+
+#Only four favs for others
+
+#Others
+data=dbGetQuery(con,"select Favs,Downloads from others")
+ggplot(data,aes(Favs,Downloads)) +geom_point() +geom_smooth(method=lm)
+file = ggplot(data,aes(Favs,Downloads)) +geom_point() +geom_smooth(method=lm)
+ggsave(file,file="o_favs_downloads.png")
+
+# -----------------------------------
+# Citations against downloads
+
+# Taverna 2
+# Only two citations
+
+data=dbGetQuery(con,"select Citations,Downloads from taverna_2")
+ggplot(data,aes(Citations,Downloads)) +geom_point() +geom_smooth(method=lm)
+file = ggplot(data,aes(Citations,Downloads)) +geom_point() +geom_smooth(method=lm)
+ggsave(file,file="t2_citations_downloads.png")
+
+# Taverna 1
+# Only 5
+data=dbGetQuery(con,"select Citations,Downloads from taverna_1")
+ggplot(data,aes(Citations,Downloads)) +geom_point() +geom_smooth(method=lm)
+file = ggplot(data,aes(Citations,Downloads)) +geom_point() +geom_smooth(method=lm)
+ggsave(file,file="t1_citations_downloads.png")
+
+# Rapidminer
+# Only three, negative slope
+data=dbGetQuery(con,"select Citations,Downloads from rapidminer")
+ggplot(data,aes(Citations,Downloads)) +geom_point() +geom_smooth(method=lm)
+file = ggplot(data,aes(Citations,Downloads)) +geom_point() +geom_smooth(method=lm)
+ggsave(file,file="rm_citations_downloads.png")
+
+#Others
+# 3, positive slope
+data=dbGetQuery(con,"select Citations,Downloads from others")
+ggplot(data,aes(Citations,Downloads)) +geom_point() +geom_smooth(method=lm)
+file = ggplot(data,aes(Citations,Downloads)) +geom_point() +geom_smooth(method=lm)
+ggsave(file,file="o_citations_downloads.png")
+
+# -----------------------------------
+# Embeds against downloads
+
+# Didnt measure for others, as they were so different. Rapidminer had no measure, either.
+
+# Taverna 2
+data=dbGetQuery(con,"select Embeds,Downloads from taverna_2")
+ggplot(data,aes(Embeds,Downloads)) +geom_point() +geom_smooth(method=lm)
+file = ggplot(data,aes(Embeds,Downloads)) +geom_point() +geom_smooth(method=lm)
+ggsave(file,file="t2_embeds_downloads.png")
+
+# Taverna 1
+data=dbGetQuery(con,"select Embeds,Downloads from taverna_1")
+ggplot(data,aes(Embeds,Downloads)) +geom_point() +geom_smooth(method=lm)
+file = ggplot(data,aes(Embeds,Downloads)) +geom_point() +geom_smooth(method=lm)
+ggsave(file,file="t1_embeds_downloads.png")
+
+# -----------------------------------
+# Embeds descriptions against downloads
+
+# Didnt measure for others, as they were so different. Rapidminer had no measure, either.
+
+# Taverna 2 didnt have any.
+
+# Taverna 1
+data=dbGetQuery(con,"select WF_Descriptions,Downloads from taverna_1")
+ggplot(data,aes(nchar(WF_Descriptions),Downloads)) +geom_point() +geom_smooth(method=lm)
+file = ggplot(data,aes(nchar(WF_Descriptions),Downloads)) +geom_point() +geom_smooth(method=lm)
+ggsave(file,file="t1_embeds_desc_downloads.png")
+
+# -----------------------------------
+# total descriptions against downloads
+
+# Taverna 2 - no different from normal description len against Downloads
+
+# Taverna 1
+data=dbGetQuery(con,"select WF_Descriptions,Description,Downloads from taverna_1")
+ggplot(data,aes(nchar(WF_Descriptions)+nchar(Description),Downloads)) +geom_point() +geom_smooth(method=lm)
+file = ggplot(data,aes(nchar(WF_Descriptions)+nchar(Description),Downloads)) +geom_point() +geom_smooth(method=lm)
+ggsave(file,file="t1_desc_len_tot_downloads.png")
+
+
+# -----------------------------------
+# Outputs vs. Downloads
+
+#Taverna 2
+data=dbGetQuery(con,"select Outputs,Downloads from taverna_2")
+ggplot(data,aes(Outputs,Downloads)) +geom_point() +geom_smooth(method=lm)
+file = ggplot(data,aes(Outputs,Downloads)) +geom_point() +geom_smooth(method=lm)
+ggsave(file,file="t2_outputs_downloads.png")
+
+#Taverna 1
+data=dbGetQuery(con,"select Outputs,Downloads from taverna_1")
+ggplot(data,aes(Outputs,Downloads)) +geom_point() +geom_smooth(method=lm)
+file = ggplot(data,aes(Outputs,Downloads)) +geom_point() +geom_smooth(method=lm)
+ggsave(file,file="t1_outputs_downloads.png")
+
+#Rapidminer
+# ONly 4 non-zeros
+data=dbGetQuery(con,"select Outputs,Downloads from rapidminer")
+ggplot(data,aes(Outputs,Downloads)) +geom_point() +geom_smooth(method=lm)
+file = ggplot(data,aes(Outputs,Downloads)) +geom_point() +geom_smooth(method=lm)
+ggsave(file,file="rm_outputs_downloads.png")
+
+#Others not possible. 
+
+
+# -----------------------------------
+# Outputs vs. Inputs
+
+#This is definitely not the right graph for this.
+
+# Taverna 2
+data=dbGetQuery(con,"select Outputs,Inputs from taverna_2")
+ggplot(data,aes(Inputs,Outputs)) +geom_point() +geom_smooth(method=lm)
+file = ggplot(data,aes(Inputs,Outputs)) +geom_point() +geom_smooth(method=lm)
+ggsave(file,file="t2_inputs_outputs.png")
+
+
+# -----------------------------------
+# Inputs vs. Downloads
+
+#Taverna 2
+data=dbGetQuery(con,"select Inputs,Downloads from taverna_2")
+ggplot(data,aes(Inputs,Downloads)) +geom_point() +geom_smooth(method=lm)
+file = ggplot(data,aes(Inputs,Downloads)) +geom_point() +geom_smooth(method=lm)
+ggsave(file,file="t2_inputs_downloads.png")
+
+#Taverna 1
+data=dbGetQuery(con,"select Inputs,Downloads from taverna_1")
+ggplot(data,aes(Inputs,Downloads)) +geom_point() +geom_smooth(method=lm)
+file = ggplot(data,aes(Inputs,Downloads)) +geom_point() +geom_smooth(method=lm)
+ggsave(file,file="t1_inputs_downloads.png")
+
+#Rapidminer
+# ONly 7 non-zeros
+data=dbGetQuery(con,"select Inputs,Downloads from rapidminer")
+ggplot(data,aes(Inputs,Downloads)) +geom_point() +geom_smooth(method=lm)
+file = ggplot(data,aes(Inputs,Downloads)) +geom_point() +geom_smooth(method=lm)
+ggsave(file,file="rm_inputs_downloads.png")
+
+#Others not possible. 
+
+# -----------------------------------
+# Beanshells vs Downloads
+
+#Taverna 2
+data=dbGetQuery(con,"select Beanshells,Downloads from taverna_2")
+ggplot(data,aes(Beanshells,Downloads)) +geom_point() +geom_smooth(method=lm)
+file = ggplot(data,aes(Beanshells,Downloads)) +geom_point() +geom_smooth(method=lm)
+ggsave(file,file="t2_beanshells_downloads.png")
+
+#Taverna 1
+data=dbGetQuery(con,"select Beanshells,Downloads from taverna_1")
+ggplot(data,aes(Beanshells,Downloads)) +geom_point() +geom_smooth(method=lm)
+file = ggplot(data,aes(Beanshells,Downloads)) +geom_point() +geom_smooth(method=lm)
+ggsave(file,file="t1_beanshells_downloads.png")
+
+
+# -----------------------------------
+# Amount of descriptions in the workflow vs. downloads
+
+#Taverna 2 (only one available)
+data=dbGetQuery(con,"select Titles, Authors, Descriptions,Downloads from taverna_2")
+ggplot(data,aes(Descriptions,Downloads)) +geom_point() +geom_smooth(method=lm)
+file = ggplot(data,aes(Descriptions,Downloads)) +geom_point() +geom_smooth(method=lm)
+ggsave(file,file="t2_descriptions_in_wfmeta_downloads.png")
+
+# -----------------------------------
+# Title in the workflow vs. Downloads
+
+data=dbGetQuery(con,"select Titles, Authors, Descriptions,Downloads from taverna_2")
+ggplot(data,aes(Titles,Downloads)) +geom_point() +geom_smooth(method=lm)
+file = ggplot(data,aes(Titles,Downloads)) +geom_point() +geom_smooth(method=lm)
+ggsave(file,file="t2_titles_downloads.png")
+
+# -----------------------------------
+# Amount of information in the workflow (Authors, Title, Descriptions) vs. Downloads
+
+data=dbGetQuery(con,"select Titles, Authors, Descriptions,Downloads from taverna_2")
+ggplot(data,aes(Titles+Authors+Descriptions,Downloads)) +geom_point() +geom_smooth(method=lm)
+file = ggplot(data,aes(Titles+Authors+Descriptions,Downloads)) +geom_point() +geom_smooth(method=lm)
+ggsave(file,file="t2_tad_downloads.png")
+
+# -----------------------------------
+# Authors vs. Downloads
+# One vs. All - would be useful to have this sort of judge
+
+#This should be a box plot
+
+# Taverna 2
+data=dbGetQuery(con,"select Authors,Downloads from taverna_2")
+ggplot(data,aes(Authors,Downloads)) +geom_boxplot()
+file = ggplot(data,aes(Authors,Downloads)) +geom_point() +geom_smooth(method=lm)
+ggsave(file,file="t2_authors_downloads.png")
+
+
+#In fact, all of these would probably be better as box plots...
+
+# -----------------------------------
+# local vs. downloads
+
+# Taverna 2
+data=dbGetQuery(con,"select Local_N,Downloads from taverna_2")
+ggplot(data,aes(Local_N,Downloads)) +geom_point() +geom_smooth(method=lm)
+file = ggplot(data,aes(Local_N,Downloads)) +geom_point() +geom_smooth(method=lm)
+ggsave(file,file="t2_local_n_downloads.png")
+
+#Taverna 1
+data=dbGetQuery(con,"select Local_N,Downloads from taverna_1")
+ggplot(data,aes(Local_N,Downloads)) +geom_point() +geom_smooth(method=lm)
+file = ggplot(data,aes(Local_N,Downloads)) +geom_point() +geom_smooth(method=lm)
+ggsave(file,file="t1_local_n_downloads.png")
+
+# -----------------------------------
+# string vs. downloads
+
+# Taverna 2
+data=dbGetQuery(con,"select String_N,Downloads from taverna_2")
+ggplot(data,aes(String_N,Downloads)) +geom_point() +geom_smooth(method=lm)
+file = ggplot(data,aes(String_N,Downloads)) +geom_point() +geom_smooth(method=lm)
+ggsave(file,file="t2_string_n_downloads.png")
+
+# Taverna 1
+data=dbGetQuery(con,"select String_N,Downloads from taverna_1")
+ggplot(data,aes(String_N,Downloads)) +geom_point() +geom_smooth(method=lm)
+file = ggplot(data,aes(String_N,Downloads)) +geom_point() +geom_smooth(method=lm)
+ggsave(file,file="t1_string_n_downloads.png")
+
+# -----------------------------------
+# wsdl vs. downloads
+
+# Taverna 2
+data=dbGetQuery(con,"select Wsdl_N,Downloads from taverna_2")
+ggplot(data,aes(Wsdl_N,Downloads)) +geom_point() +geom_smooth(method=lm)
+file = ggplot(data,aes(Wsdl_N,Downloads)) +geom_point() +geom_smooth(method=lm)
+ggsave(file,file="t2_wsdl_n_downloads.png")
+
+# Taverna 1
+data=dbGetQuery(con,"select Wsdl_N,Downloads from taverna_1")
+ggplot(data,aes(Wsdl_N,Downloads)) +geom_point() +geom_smooth(method=lm)
+file = ggplot(data,aes(Wsdl_N,Downloads)) +geom_point() +geom_smooth(method=lm)
+ggsave(file,file="t1_wsdl_n_downloads.png")
+
+# -----------------------------------
+# XML vs. downloads
+
+# Taverna 2
+data=dbGetQuery(con,"select Xml_N,Downloads from taverna_2")
+ggplot(data,aes(Xml_N,Downloads)) +geom_point() +geom_smooth(method=lm)
+file = ggplot(data,aes(Xml_N,Downloads)) +geom_point() +geom_smooth(method=lm)
+ggsave(file,file="t2_xml_n_downloads.png")
+
+# Taverna 1 brought up zero.
+
+# -----------------------------------
+# Bio vs. downloads
+
+# Taverna 2
+data=dbGetQuery(con,"select Bio_N,Downloads from taverna_2")
+ggplot(data,aes(Bio_N,Downloads)) +geom_point() +geom_smooth(method=lm)
+file = ggplot(data,aes(Bio_N,Downloads)) +geom_point() +geom_smooth(method=lm)
+ggsave(file,file="t2_bio_n_downloads.png")
+
+# Taverna 1
+data=dbGetQuery(con,"select Bio_N,Downloads from taverna_1")
+ggplot(data,aes(Bio_N,Downloads)) +geom_point() +geom_smooth(method=lm)
+file = ggplot(data,aes(Bio_N,Downloads)) +geom_point() +geom_smooth(method=lm)
+ggsave(file,file="t1_bio_n_downloads.png")
+
+# -----------------------------------
+# SOAP vs. downloads
+
+# Taverna 2
+data=dbGetQuery(con,"select Soap_N,Downloads from taverna_2")
+ggplot(data,aes(Soap_N,Downloads)) +geom_point() +geom_smooth(method=lm)
+file = ggplot(data,aes(Soap_N,Downloads)) +geom_point() +geom_smooth(method=lm)
+ggsave(file,file="t2_soap_n_downloads.png")
+
+# Taverna 1
+data=dbGetQuery(con,"select Soap_N,Downloads from taverna_1")
+ggplot(data,aes(Soap_N,Downloads)) +geom_point() +geom_smooth(method=lm)
+file = ggplot(data,aes(Soap_N,Downloads)) +geom_point() +geom_smooth(method=lm)
+ggsave(file,file="t1_soap_n_downloads.png")
+
+
+
+# -----------------------------------
+# myExperiment use: attributions, credits, reviews, favourites, ratings, comments vs. downloads
+
+# Taverna 2
+data=dbGetQuery(con,"select Attributions, Credits, Favs, Ratings, Citations, Reviews, Comments, Downloads from taverna_2")
+ggplot(data,aes(Attributions + Credits + Favs + Ratings + Citations + Reviews + Comments,Downloads)) +geom_point() +geom_smooth(method=lm)
+file = ggplot(data,aes(Attributions + Credits + Favs + Ratings + Citations + Reviews + Comments,Downloads)) +geom_point() +geom_smooth(method=lm)
+ggsave(file,file="t2_community_downloads.png")
+
+# Taverna 1
+data=dbGetQuery(con,"select Attributions, Credits, Favs, Ratings, Citations, Reviews, Comments, Downloads from taverna_1")
+ggplot(data,aes(Attributions + Credits + Favs + Ratings + Citations + Reviews + Comments,Downloads)) +geom_point() +geom_smooth(method=lm)
+file = ggplot(data,aes(Attributions + Credits + Favs + Ratings + Citations + Reviews + Comments,Downloads)) +geom_point() +geom_smooth(method=lm)
+ggsave(file,file="t1_community_downloads.png")
+
+# Rapid Miner
+data=dbGetQuery(con,"select Attributions, Credits, Favs, Ratings, Citations, Reviews, Comments, Downloads from rapidminer")
+ggplot(data,aes(Attributions + Credits + Favs + Ratings + Citations + Reviews + Comments,Downloads)) +geom_point() +geom_smooth(method=lm)
+file = ggplot(data,aes(Attributions + Credits + Favs + Ratings + Citations + Reviews + Comments,Downloads)) +geom_point() +geom_smooth(method=lm)
+ggsave(file,file="rm_community_downloads.png")
+
+# Others
+data=dbGetQuery(con,"select Attributions, Credits, Favs, Ratings, Citations, Reviews, Comments, Downloads from others")
+ggplot(data,aes(Attributions + Credits + Favs + Ratings + Citations + Reviews + Comments,Downloads)) +geom_point() +geom_smooth(method=lm)
+file = ggplot(data,aes(Attributions + Credits + Favs + Ratings + Citations + Reviews + Comments,Downloads)) +geom_point() +geom_smooth(method=lm)
+ggsave(file,file="o_community_downloads.png")
+
+
+# -----------------------------------
+# myExperiment use: attributions, credits, reviews, favourites, ratings vs. downloads
+# minus comments as those are often from the Authors
+
+# Taverna 2
+data=dbGetQuery(con,"select Attributions, Credits, Favs, Ratings, Citations, Reviews, Downloads from taverna_2")
+ggplot(data,aes(Attributions + Credits + Favs + Ratings + Citations + Reviews,Downloads)) +geom_point() +geom_smooth(method=lm)
+file = ggplot(data,aes(Attributions + Credits + Favs + Ratings + Citations + Reviews,Downloads)) +geom_point() +geom_smooth(method=lm)
+ggsave(file,file="t2_community_nc_downloads.png")
+
+# Taverna 1
+data=dbGetQuery(con,"select Attributions, Credits, Favs, Ratings, Citations, Reviews, Downloads from taverna_1")
+ggplot(data,aes(Attributions + Credits + Favs + Ratings + Citations + Reviews,Downloads)) +geom_point() +geom_smooth(method=lm)
+file = ggplot(data,aes(Attributions + Credits + Favs + Ratings + Citations + Reviews,Downloads)) +geom_point() +geom_smooth(method=lm)
+ggsave(file,file="t1_community_nc_downloads.png")
+
+# Rapid Miner
+data=dbGetQuery(con,"select Attributions, Credits, Favs, Ratings, Citations, Reviews, Downloads from rapidminer")
+ggplot(data,aes(Attributions + Credits + Favs + Ratings + Citations + Reviews, Downloads)) +geom_point() +geom_smooth(method=lm)
+file = ggplot(data,aes(Attributions + Credits + Favs + Ratings + Citations + Reviews,Downloads)) +geom_point() +geom_smooth(method=lm)
+ggsave(file,file="rm_community_nc_downloads.png")
+
+# Others
+data=dbGetQuery(con,"select Attributions, Credits, Favs, Ratings, Citations, Reviews, Downloads from others")
+ggplot(data,aes(Attributions + Credits + Favs + Ratings + Citations + Reviews, Downloads)) +geom_point() +geom_smooth(method=lm)
+file = ggplot(data,aes(Attributions + Credits + Favs + Ratings + Citations + Reviews,Downloads)) +geom_point() +geom_smooth(method=lm)
+ggsave(file,file="o_community_nc_downloads.png")
+
+
+# --------------------------------------------------------------------------------------------------------------------------------------------
+
+#Things  I would like to do:
+
+# -----------------------------------
+# When Updated vs. Downloads
+
+# -----------------------------------
+# When Uploaded vs. Rate of Downloads
+
+# Look up specific tags, processors, datalinks, embedded workflows, etc. which help downloadability
+# What are credits? Attributions? how are they different from citations?
