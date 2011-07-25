@@ -100,6 +100,62 @@ for line in file.readlines():
 	print "\"" + downloads.strip() + "\",", #Downloads
 	output.write("\"" + downloads.strip() + "\",",)
 	
+	#URL search for the statistics page
+	time.sleep(1) #Let's be nice. 
+	stats_line = line.strip() + "/statistics"
+	stats_u = urllib2.urlopen(stats_line.strip())
+	
+	# mung it all together
+	rawstats = "".join(map(str.strip,stats_u.readlines()))
+	bstats = BeautifulSoup(rawstats)
+	
+	#print the workflow statistics address on myExperiment
+	print "\"" + stats_line.strip() + "\",", 
+	output.write("\"" + stats_line.strip() + "\",",)
+	
+	#get the entire statistics table and output it
+	stats = bstats.find("div", {"class": "box_standout"}).findAll("b")
+	#total views
+	total_v = str(stats[0].contents[0]) + ", "
+	#total downloads
+	total_d = str(stats[1].contents[0]) + ", "
+	#views on myexperiment
+	myexp_v = str(stats[2].contents[0]) + ", "
+	#views on myexperiment from members
+	myexp_v_m = str(stats[3].contents[0]) + ", "
+	#views on myexperiment from anonymous IPs
+	myexp_v_a = str(stats[4].contents[0]) + ", "
+	#downloads on myexperiment
+	myexp_d = str(stats[5].contents[0]) + ", "
+	#downloads on myexperiment from members
+	myexp_d_m = str(stats[6].contents[0]) + ", "
+	#downloads on myexperiment from anonymous people
+	myexp_d_a = str(stats[7].contents[0]) + ", "
+	#external views (say, on Taverna)
+	ext_v = str(stats[8].contents[0]) + ", "
+	#external downloads
+	ext_d = str(stats[9].contents[0]) + ", "
+	print "\"" + total_v + "\",",
+	print "\"" + total_d + "\",",
+	print "\"" + myexp_v + "\",",
+	print "\"" + myexp_v_m + "\",",
+	print "\"" + myexp_v_a + "\",",
+	print "\"" + myexp_d + "\",",
+	print "\"" + myexp_d_m + "\",",
+	print "\"" + myexp_d_a + "\",",
+	print "\"" + ext_v + "\",",
+	print "\"" + ext_d + "\",",
+	output.write("\"" + total_v + "\",",)
+	output.write("\"" + total_d + "\",",)
+	output.write("\"" + myexp_v + "\",",)	
+	output.write("\"" + myexp_v_m + "\",",)
+	output.write("\"" + myexp_v_a + "\",",)
+	output.write("\"" + myexp_d + "\",",)	
+	output.write("\"" + myexp_d_m + "\",",)
+	output.write("\"" + myexp_d_a + "\",",)
+	output.write("\"" + ext_v + "\",",)	
+	output.write("\"" + ext_d + "\",",)
+	
 	#Get the more section
 	number_regex = re.compile(".*(\d+)")
 	for x in bs.find("div", {"class": "stats_box"}).findAll("a"):
@@ -176,7 +232,7 @@ for line in file.readlines():
 						proc_names += proc_name.contents[0] + ", "
 				print "\"" + proc_names + "\",",
 				output.write("\"" + proc_names + "\",",)
-			
+				
 				#Get the embedded workflow names, amount, and description
 				wf_names = ""
 				wf_descrip = ""
@@ -191,12 +247,13 @@ for line in file.readlines():
 			 	workflow = [0]
 			 	soaplab = [0]
 			 	bio = [0]
+			 	
 				for x in proc_var:
 					wf_name=x.contents
 					match_wf = re.search("workflow",str(wf_name[1]))
 					if (match_wf != None):
 						
-							#Get the names, put them into a single list
+						#Get the names, put them into a single list
 						wfnames =  wf_name[0].find("b").contents[0]
 						wf_names += str(wfnames) + ", "
 				
@@ -219,7 +276,7 @@ for line in file.readlines():
 					match_wf = re.search("bean",str(wf_name[1]))
 					if (match_wf != None):
 					 	beanshell[0] += 1
-					match_wf = re.searchprint
+					match_wf = re.search("wsdl",str(wf_name[1]))
 					if (match_wf != None):
 			 			wsdl[0] += 1
 			 		match_wf = re.search("xmlsplitter",str(wf_name[1]))
@@ -298,7 +355,7 @@ for line in file.readlines():
 				print "\"" + output_names + "\",",
 				output.write("\"" + output_names + "\",",)	
 			except:
-				print 
+				print
 				
 	print
 	output.write("\n")
