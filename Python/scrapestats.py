@@ -65,7 +65,7 @@ for line in file.readlines():
 	print "\"" + myexp_d_m + "\",",
 	print "\"" + myexp_d_a + "\",",
 	print "\"" + ext_v + "\",",
-	print "\"" + ext_d + "\",",
+    print "\"" + ext_d + "\",",
 	output.write("\"" + total_v + "\",",)
 	output.write("\"" + total_d + "\",",)
 	output.write("\"" + myexp_v + "\",",)	
