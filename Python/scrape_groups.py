@@ -161,6 +161,6 @@ for line in file.readlines():
 
     print
     output.write("\n")
-    #time.sleep(1)
+    time.sleep(1)
 
 output.close()

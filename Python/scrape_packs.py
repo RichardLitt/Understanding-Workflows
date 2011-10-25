@@ -87,7 +87,7 @@ for line in file.readlines():
     output.write("\"" + external + "\",")
 
     #URL search for the statistics page
-    #time.sleep(1) #Let's be nice. 
+    time.sleep(1) #Let's be nice. 
     stats_line = line.strip().replace(".html", "") + "/statistics"
     stats_u = urllib2.urlopen(stats_line.strip())
 
@@ -144,6 +144,6 @@ for line in file.readlines():
 
     print
     output.write("\n")
-    #time.sleep(1)
+    time.sleep(1)
 
 output.close()
