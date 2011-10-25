@@ -3,6 +3,10 @@ myExperiment Scraper by Steve K. and Richard L.
 Released into the Public Domain like pythons south of Tallahassee. Free.  
 Delay added to be nice to the servers. Many thanks to Beautiful Soup.
 
+Example input
+http...ows/16
+python scrapescrape.py feedme taverna_2
+
 """
 
 import sys
