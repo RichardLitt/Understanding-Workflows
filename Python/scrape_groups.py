@@ -24,7 +24,6 @@ output = open(output_file_name,'a')
 for line in file.readlines():
     u = urllib2.urlopen(line.strip())
 
-
     # mung it all together
     rawhtml = "".join(map(str.strip,u.readlines()))
 
@@ -39,9 +38,6 @@ for line in file.readlines():
     output.write("\"" +  title + "\",",)
 
     mini_nav = bs.find("div", {"class": "contribution_mini_nav"}).findAll("a")
-
-    #members = mini_nav[0].contents[0].replace("Members (", "")
-    #print members
 
     #This seems to work at the moment, so we're going to go with this. 
     members = re.search("(\d+)",str(mini_nav[0]))
@@ -103,8 +99,8 @@ for line in file.readlines():
 
     #Let's get that massive description block raw. 
     #Might have an issue with " eventually in this block. 
-    description = bs.find("div", {"class": "box_simple"})#.replace("\"", "'")
-    print "description goes here"
+    description = bs.find("div", {"class": "box_simple"})
+    description = str(description).replace("\"", "")
     output.write("\"" + str(description) + "\",",)
 
     #When was this created?

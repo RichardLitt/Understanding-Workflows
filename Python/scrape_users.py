@@ -40,43 +40,43 @@ for line in file.readlines():
 
 
     #I believe I have your name!
-    name = str(info[0].contents[1]) + ", "
+    name = str(info[0].contents[1])
     print name
     output.write("\"" + name + "\",",)
 
 
     #Joined date!
-    join = str(info[1].contents[1]) + ", "
+    join = str(info[1].contents[1])
     print join
     output.write("\"" + join + "\",",)
 
 
     #Last Seen!
-    seen = str(info[2].contents[1]) + ", "
+    seen = str(info[2].contents[1])
     print seen
     output.write("\"" + seen + "\",",)
 
 
     #Emails?
-    email = info[3].contents[1].contents[0] + ", "
+    email = info[3].contents[1].contents[0]
     print email
     output.write("\"" + email + "\",",)
 
 
     #How about a website?
-    website = info[4].contents[1].contents[0] + ", "
+    website = info[4].contents[1].contents[0]
     print website
     output.write("\"" + website + "\",",)
 
 
     #How about a location?
-    location = info[5].contents[1] + ", "
+    location = info[5].contents[1]
     print location
     output.write("\"" + location + "\",",)
 
 
     #How many friends do you have, I wonder...
-    friend_no = info[6].contents[0].contents[0].contents[0].replace(" Friends", "") + ", "
+    friend_no = info[6].contents[0].contents[0].contents[0].replace(" Friends", "")
     print friend_no
     output.write("\"" + friend_no + "\",",)
 
@@ -88,7 +88,7 @@ for line in file.readlines():
 
 
     #How about we get some group information
-    group_admin_no = info[7].contents[0].contents[0].contents[0].replace(" Groups (admin)", "") + ", "
+    group_admin_no = info[7].contents[0].contents[0].contents[0].replace(" Groups (admin)", "")
     print group_admin_no
     output.write("\"" + group_admin_no + "\",",)
 
@@ -101,7 +101,7 @@ for line in file.readlines():
 
 
     #Why don't we get the amount of groups she's a member of
-    group_member_no = info[8].contents[0].contents[0].contents[0].replace(" Groups (member)", "") + ", "
+    group_member_no = info[8].contents[0].contents[0].contents[0].replace(" Groups (member)", "")
     print group_member_no
     output.write("\"" + group_member_no + "\",",)
 
@@ -114,7 +114,7 @@ for line in file.readlines():
 
 
     #Why don't we get the amount of packs she's got
-    packs_no = info[9].contents[0].contents[0].contents[0].replace(" Packs", "") + ", "
+    packs_no = info[9].contents[0].contents[0].contents[0].replace(" Packs", "")
     print packs_no
     output.write("\"" + packs_no + "\",",)
 
@@ -127,7 +127,7 @@ for line in file.readlines():
 
 
     #Why don't we get the amount of groups she's a member of
-    files_no = info[10].contents[0].contents[0].contents[0].replace(" Files", "") + ", "
+    files_no = info[10].contents[0].contents[0].contents[0].replace(" Files", "")
     print files_no
     output.write("\"" + files_no + "\",",)
 
@@ -140,7 +140,7 @@ for line in file.readlines():
 
 
     #Why don't we get the amount of workslows she's uploaded?
-    wf_no = info[11].contents[0].contents[0].contents[0].replace(" Workflows", "") + ", "
+    wf_no = info[11].contents[0].contents[0].contents[0].replace(" Workflows", "")
     print wf_no
     output.write("\"" + wf_no + "\",",)
 
@@ -153,7 +153,7 @@ for line in file.readlines():
 
 
     #Why don't we grok her amount of favs?
-    fav_no = info[12].contents[0].contents[0].contents[0].replace(" Favourites", "") + ", "
+    fav_no = info[12].contents[0].contents[0].contents[0].replace(" Favourites", "")
     print fav_no
     output.write("\"" + fav_no + "\",",)
 
@@ -166,7 +166,7 @@ for line in file.readlines():
 
 
     #How about the amount of credits she's gotten?
-    credits_no = info[13].contents[0].contents[1].contents[0].replace(" times", "") + ", "
+    credits_no = info[13].contents[0].contents[1].contents[0].replace(" times", "")
     print credits_no
     output.write("\"" + credits_no + "\",",)
 
@@ -179,43 +179,43 @@ for line in file.readlines():
 
 
     #How about the average ratings she's gotten?
-    ratings = info[15].contents[0].replace(" / 5", "") + ", "
+    ratings = info[15].contents[0].replace(" / 5", "")
     print ratings
     output.write("\"" + ratings + "\",",)
 
 
     #And how many ratings total?
-    ratings_no = info[16].contents[0].replace("(", "").replace(" ratings in total)", "") + ", "
+    ratings_no = info[16].contents[0].replace("(", "").replace(" ratings in total)", "")
     print ratings_no
     output.write("\"" + ratings_no + "\",",)
 
 
     #How about their autobio?
-    autobio = info[18].contents[0] + ", "
+    autobio = info[18].contents[0]
     print autobio
     output.write("\"" + autobio + "\",",)
 
 
     #Interests?
-    interests = info[21].contents[0] + ", "
+    interests = info[21].contents[0]
     print interests
     output.write("\"" + interests  + "\",",)
 
 
     #Field/Industry
-    field = info[22].contents[1] + ", "
+    field = info[22].contents[1]
     print field
     output.write("\"" + field + "\",",)
 
 
     #Occupation
-    occupation = info[23].contents[1] + ", "
+    occupation = info[23].contents[1]
     print occupation
     output.write("\"" + occupation  + "\",",)
 
 
     #Organisation
-    organisation = info[25].contents[0] + ", "
+    organisation = info[25].contents[0]
     print organisation
     output.write("\"" + organisation + "\",",)
 
@@ -256,6 +256,6 @@ for line in file.readlines():
     output.write("\n")
 
     #Let's be nice. Note - disabled for my own server, because who cares.
-    #time.sleep(1)
+    time.sleep(1)
 
 output.close()

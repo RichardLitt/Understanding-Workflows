@@ -100,9 +100,9 @@ for line in file.readlines():
 
     #Description?
     description = bs.find("div", {"class": "contribution_version_inner_box"})
-    description = description.contents[5]#.replace("\"", "")
+    description = str(description.contents[5]).replace("\"", "")
     print description
-    output.write("\"" +  str(description) + "\",",)
+    output.write("\"" + description + "\",",)
 
     #What's the download url?
     download = bs.find("div", {"class": "contribution_version_inner_box"})
@@ -186,25 +186,25 @@ for line in file.readlines():
     #get the entire statistics table and output it
     stats = bstats.find("div", {"class": "box_standout"}).findAll("b")
     #total views
-    total_v = str(stats[0].contents[0]) + ", "
+    total_v = str(stats[0].contents[0])
     #total downloads
-    total_d = str(stats[1].contents[0]) + ", "
+    total_d = str(stats[1].contents[0])
     #views on myexperiment
-    myexp_v = str(stats[2].contents[0]) + ", "
+    myexp_v = str(stats[2].contents[0])
     #views on myexperiment from members
-    myexp_v_m = str(stats[3].contents[0]) + ", "
+    myexp_v_m = str(stats[3].contents[0])
     #views on myexperiment from anonymous IPs
-    myexp_v_a = str(stats[4].contents[0]) + ", "
+    myexp_v_a = str(stats[4].contents[0])
     #downloads on myexperiment
-    myexp_d = str(stats[5].contents[0]) + ", "
+    myexp_d = str(stats[5].contents[0])
     #downloads on myexperiment from members
-    myexp_d_m = str(stats[6].contents[0]) + ", "
+    myexp_d_m = str(stats[6].contents[0])
     #downloads on myexperiment from anonymous people
-    myexp_d_a = str(stats[7].contents[0]) + ", "
+    myexp_d_a = str(stats[7].contents[0])
     #external views (say, on Taverna)
-    ext_v = str(stats[8].contents[0]) + ", "
+    ext_v = str(stats[8].contents[0])
     #external downloads
-    ext_d = str(stats[9].contents[0]) + ", "
+    ext_d = str(stats[9].contents[0])
     print "\"" + total_v + "\",",
     print "\"" + total_d + "\",",
     print "\"" + myexp_v + "\",",
