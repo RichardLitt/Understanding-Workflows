@@ -4,7 +4,7 @@ myExperiment Scraper by Richard L.
 Released into the Public Domain like college students without debt. Free. 
 Delay added to be nice to the servers. Many thanks to Beautiful Soup.
 
-This scrapes the filess pages.
+This scrapes the files pages.
 
 """
 #Import time
@@ -33,17 +33,20 @@ for line in file.readlines():
     #print the file address on myExperiment
     print line.strip() + ", "
     output.write("\"" + line.strip() + "\",",)
-
     #Let's get the title!
     title = bs.find("h1", {"class": "contribution_title"})
-    print title.contents[0].replace("File Entry: ", "") + ", "
-    output.write("\"" + title.contents[0] + "\",",)
+    print title.contents[0].replace("File Entry: ", "").encode('ascii', 'ignore') + ", "
+    output.write("\"" + title.contents[0].replace("File Entry: ",
+    "").encode('ascii', 'ignore') + "\",",)
 
     #When was it created? When was it uploaded?
     created_obj = bs.find("div", {"class":
         "contribution_aftertitle"})
     created = created_obj.contents[1].replace("&nbsp;", "")
-    uploaded = created_obj.contents[3].replace("&nbsp;", "")
+    try:
+        uploaded = created_obj.contents[3].replace("&nbsp;", "")
+    except:
+        uploaded = ""
     print created + ", " + uploaded + ", "
     output.write("\"" + created + "\",",)
     output.write("\"" + uploaded + "\",",)
@@ -105,8 +108,11 @@ for line in file.readlines():
     output.write("\"" + description + "\",",)
 
     #What's the download url?
-    download = bs.find("div", {"class": "contribution_version_inner_box"})
-    download = download.contents[8].contents[0].contents[0].contents[0]['href']
+    try:
+        download = bs.find("div", {"class": "contribution_version_inner_box"})
+        download = download.contents[8].contents[0].contents[0].contents[0]['href']
+    except:
+        download = ""
     print download
     output.write("\"" +  download + "\",",)
 
@@ -116,7 +122,7 @@ for line in file.readlines():
     uploader = uploader_obj.contents[1].contents[0].contents[0].contents[0].contents[0]['title']
     print uploader_url + ", " + uploader + ", "
     output.write("\"" + uploader_url  + "\",",)
-    output.write("\"" + uploader  + "\",",)
+    output.write("\"" + uploader.encode('ascii', 'ignore')  + "\",",)
 
     #What is the licence?
     license_obj = bs.find("div", {"class": "contribution_currentlicense"})
@@ -125,12 +131,16 @@ for line in file.readlines():
     output.write("\"" + str(license)  + "\",",)
 
     #Who has credited this?
-    credit_obj = bs.findAll("div", {"class": "contribution_section_box"})[2]
-    credit_url = credit_obj.findAll("a")[1]['href']
-    credit = credit_obj.findAll("a")[1]
-    credit = credit.contents[0]
+    try:
+        credit_obj = bs.findAll("div", {"class": "contribution_section_box"})[2]
+        credit_url = credit_obj.findAll("a")[1]['href']
+        credit = credit_obj.findAll("a")[1]
+        credit = credit.contents[0]
+    except:
+        credit = ""
+        credit_url = ""
     print credit + ", " + credit_url + ", "
-    output.write("\"" + credit  + "\",",)
+    output.write("\"" + credit.encode('ascii', 'ignore') + "\",",)
     output.write("\"" + credit_url  + "\",",)
 
     #No attribution information.
@@ -153,10 +163,14 @@ for line in file.readlines():
     #Not shared with groups.
 
     #What packs is this featured in?
-    pack_obj = bs.findAll("div", {"class": "contribution_section_box"})[5]
-    pack_url = pack_obj.findAll("a")[1]['href']
-    pack = pack_obj.findAll("a")[1]
-    pack = pack.contents[0]
+    try:
+        pack_obj = bs.findAll("div", {"class": "contribution_section_box"})[5]
+        pack_url = pack_obj.findAll("a")[1]['href']
+        pack = pack_obj.findAll("a")[1]
+        pack = pack.contents[0]
+    except:
+        pack = ""
+        pack_url = ""
     print pack + ", " + pack_url + ", "
     output.write("\"" + pack  + "\",",)
     output.write("\"" + pack_url  + "\",",)
@@ -225,6 +239,12 @@ for line in file.readlines():
     output.write("\"" + myexp_d_a + "\",",)
     output.write("\"" + ext_v + "\",",)
     output.write("\"" + ext_d + "\",",)
+
+    #Timestamp of scrape.
+    import time
+    import datetime
+    print "\"" + str(datetime.datetime.now()) + "\",",
+    output.write("\"" + str(datetime.datetime.now()) + "\",",)
 
     print
     output.write("\n")

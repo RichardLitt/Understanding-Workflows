@@ -40,32 +40,42 @@ for line in file.readlines():
     output.write("\"" + title.contents[0].replace("Pack: ", "") + "\",")
 
     #What is the description?
-    description_obj = bs.find("div", {"class": "contribution_description"})
-    description = description_obj.contents[0]
+    try:
+        description_obj = bs.find("div", {"class": "contribution_description"})
+        description = description_obj.contents[0]
+    except:
+        description = ""
     print description
     output.write("\"" + str(description) + "\",")
 
     #How many items are there?
-    items_obj = bs.find("h4").contents[4].contents[0].replace("(", "")
+    items_obj = bs.find("h4").find("span").contents[0].replace("(", "")
     items_obj = items_obj.replace(")", "")
     print items_obj
     output.write("\"" + items_obj + "\",")
 
     #Let's grab the workflows in this pack, their URLs, and who uploaded them. 
-    packs_obj = bs.find("ul", {"id": "packItemsList"}).findAll(text='Workflow:')
-    packs_url = ""
-    packs_name = ""
-    packs_user_url = ""
-    packs_user = ""
-    packs_no = 0
-    for x in packs_obj:
-        packs_url_obj = x.findNext("a")
-        packs_url += packs_url_obj['href'] + ", "
-        packs_no += 1
-        packs_name += str(packs_url_obj.contents[0]) + ", "
-        packs_user_obj = packs_url_obj.findNext("a")
-        packs_user_url += packs_user_obj['href'] + ", "
-        packs_user += packs_user_obj.contents[0] + ", "
+    try:
+        packs_obj = bs.find("ul", {"id": "packItemsList"}).findAll(text='Workflow:')
+        packs_url = ""
+        packs_name = ""
+        packs_user_url = ""
+        packs_user = ""
+        packs_no = 0
+        for x in packs_obj:
+            packs_url_obj = x.findNext("a")
+            packs_url += packs_url_obj['href'] + ", "
+            packs_no += 1
+            packs_name += str(packs_url_obj.contents[0]) + ", "
+            packs_user_obj = packs_url_obj.findNext("a")
+            packs_user_url += packs_user_obj['href'] + ", "
+            packs_user += packs_user_obj.contents[0] + ", "
+    except:
+        packs_url = ""
+        packs_name = ""
+        packs_user_url = ""
+        packs_user = ""
+        packs_no = 0
     print packs_url
     print packs_name
     print packs_user_url
@@ -74,15 +84,18 @@ for line in file.readlines():
     output.write("\"" + packs_url + "\",")
     output.write("\"" + packs_name + "\",")
     output.write("\"" + packs_user_url + "\",")
-    output.write("\"" + packs_user + "\",")
+    output.write("\"" + packs_user.encode('ascii', 'ignore') + "\",")
     output.write("\"" + str(packs_no) + "\",")
 
     #Let's grab the external links while we're at it. 
-    external_obj = bs.find("ul", {"id": "packItemsList"}).findAll(text='External:')
-    external = ""
-    for x in external_obj:
-        external_url_obj = x.findNext("a")
-        external += external_url_obj['href'] + ", "
+    try:
+        external_obj = bs.find("ul", {"id": "packItemsList"}).findAll(text='External:')
+        external = ""
+        for x in external_obj:
+            external_url_obj = x.findNext("a")
+            external += external_url_obj['href'] + ", "
+    except:
+        external = ""
     print external
     output.write("\"" + external + "\",")
 
@@ -141,6 +154,12 @@ for line in file.readlines():
     output.write("\"" + myexp_d_a + "\",")
     output.write("\"" + ext_v + "\",")
     output.write("\"" + ext_d + "\",")
+
+    #Timestamp of scrape.
+    import time
+    import datetime
+    print "\"" + str(datetime.datetime.now()) + "\",",
+    output.write("\"" + str(datetime.datetime.now()) + "\",",)
 
     print
     output.write("\n")

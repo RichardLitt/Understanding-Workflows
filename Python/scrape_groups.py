@@ -35,7 +35,7 @@ for line in file.readlines():
 
     title = bs.find("h1").contents[0].replace("Group: ", "")
     print title + ", "
-    output.write("\"" +  title + "\",",)
+    output.write("\"" +  title.encode('ascii', 'ignore') + "\",",)
 
     mini_nav = bs.find("div", {"class": "contribution_mini_nav"}).findAll("a")
 
@@ -110,8 +110,10 @@ for line in file.readlines():
     output.write("\"" + creation_date + "\",",)
 
     #What is the unique name?
-    unique_name = bs.find("div", {"class":
-        "contribution_left_box"}).contents[2].contents[1]
+    try:
+        unique_name = bs.find("div", {"class": "contribution_left_box"}).contents[2].contents[1]
+    except:
+        unique_name = ""
     print unique_name
     output.write("\"" + unique_name + "\",",)
 
@@ -140,14 +142,18 @@ for line in file.readlines():
 
     #What tags have users given it?
     #Why don't we grab the urls as well?
-    tags_obj = bs.find("div", {"id": "user_tags"}).findAll("a")
-    tags_url = ""
-    tags = ""
-    for x in tags_obj:
-        tags_url_obj = x['href'] + ", "
-        tags_url += tags_url_obj
-        tags_name = x.contents[0]
-        tags += tags_name + ", "
+    try:
+        tags_obj = bs.find("div", {"id": "user_tags"}).findAll("a")
+        tags_url = ""
+        tags = ""
+        for x in tags_obj:
+            tags_url_obj = x['href'] + ", "
+            tags_url += tags_url_obj
+            tags_name = x.contents[0]
+            tags += tags_name + ", "
+    except:
+        tags_url = ""
+        tags = ""
     print tags_url
     print tags
     output.write("\"" + tags_url + "\",",)
@@ -158,6 +164,12 @@ for line in file.readlines():
     #Ok then. 
 
     #Same with the comments. 
+
+    #Timestamp of scrape.
+    import time
+    import datetime
+    print "\"" + str(datetime.datetime.now()) + "\",",
+    output.write("\"" + str(datetime.datetime.now()) + "\",",)
 
     print
     output.write("\n")
