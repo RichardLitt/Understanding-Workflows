@@ -2,7 +2,8 @@ library(RMySQL)
 library(ggplot2) 
 library(lubridate)
 setwd("~/Dropbox/DataOne Workflows/IDCC-paper")
-require('db_connect~.r')
+con<-dbConnect(MySQL(),user="root",password=passwd,dbname="workflowz",host="127.0.0.1")
+
 #Update this according to your own server
 # small change
 
@@ -21,9 +22,20 @@ file1 = ggplot(data4,aes(x=bipcod)) +geom_histogram(binwidth=2) +xlab("Index of 
 
 
 ggsave(file1, file="A-Tavernas Histogram - Bipcod.png",width=4.2,height=4.2)
- 
-
 # -------------------------------------------------------------------
+
+#Bipcod Histogram - core users only
+data = dbGetQuery(con,"select Uploaded, Updated, Versions, Views, Downloads, Myexp_v, Myexp_v_m, Myexp_v_a, Myexp_d, Myexp_d_a, Ext_v, Ext_d, Credits, Attributions, Number_Tags, Favs, Ratings, Citations, Reviews, Comments, Inputs, Processors, Beanshells, Outputs, Datalinks, Coordinators, Embeds, Local_N, String_N, Beanshell_N, Wsdl_N, Xml_N, Soap_N, Bio_N from taverna_2 where Uploaded<=3")
+data1 = dbGetQuery(con,"select Uploaded, Updated, Versions, Views, Downloads, Myexp_v, Myexp_v_m, Myexp_v_a, Myexp_d, Myexp_d_a, Ext_v, Ext_d, Credits, Attributions, Number_Tags, Favs, Ratings, Citations, Reviews, Comments, Inputs, Processors, Beanshells, Outputs, Datalinks, Coordinators, Embeds, Local_N, String_N, Beanshell_N, Wsdl_N, Xml_N, Soap_N, Bio_N from taverna_1 where Uploaded <=3")
+data4 = rbind(data,data1)
+
+data4$bipcod=data4$Beanshells+data4$Inputs+data4$Processors+data4$Outputs+data4$Datalinks+data4$Coordinators
+file1 = ggplot(data4,aes(x=bipcod)) +geom_histogram(binwidth=2) +xlab("Index of complexity") + ylab("Count") + opts(title="Workflow complexity") + opts(plot.title=theme_text(size = 24, face ='bold')) + opts(panel.grid.major=theme_line(colour=NA)) + opts(panel.grid.minor=theme_line(colour=NA)) + no_bg + draw_axis + axis_labels
+
+
+ggsave(file1, file="A-Tavernas Histogram - Bipcod_CORE.png",width=4.2,height=4.2)
+# -------------------------------------------------------------------
+
 # Histogram of user uploads
 
 #All
@@ -38,8 +50,23 @@ summary=count(data, c("User_URL"))
 
 file2 = ggplot(summary,aes(freq)) +geom_histogram(binwidth=10) +xlab("# of workflows contributed per user") + ylab("Frequency") + opts(title="User uploads") + opts(plot.title=theme_text(size = 24, face ='bold')) + opts(panel.grid.major=theme_line(colour=NA)) + opts(panel.grid.minor=theme_line(colour=NA)) + no_bg + draw_axis + axis_labels
 
-
 ggsave(file2,file="B-all_User_URL_nchar_description.png",width=4.2,height=4.2)
+
+# Histogram of user uploads CORE ONLY
+
+#All
+data1=dbGetQuery(con,"select User_URL,Uploaded,Description from taverna_1 where Uploaded <=3")
+data2=dbGetQuery(con,"select User_URL,Uploaded,Description from taverna_2 where Uploaded <=3")
+data3=dbGetQuery(con,"select User_URL,Uploaded,Description from rapidminer where Uploaded <=3")
+data4=dbGetQuery(con,"select User_URL,Uploaded,Description from others where Uploaded <=3")
+data= rbind(data1, data2, data3, data4)
+data$User_URL = sub("http://www.myexperiment.org/users/", "", c(data$User_URL))
+
+summary=count(data, c("User_URL"))
+
+file2 = ggplot(summary,aes(freq)) +geom_histogram(binwidth=10) +xlab("# of workflows contributed per user") + ylab("Frequency") + opts(title="User uploads") + opts(plot.title=theme_text(size = 24, face ='bold')) + opts(panel.grid.major=theme_line(colour=NA)) + opts(panel.grid.minor=theme_line(colour=NA)) + no_bg + draw_axis + axis_labels
+
+ggsave(file2,file="B-all_User_URL_nchar_description_CORE.png",width=4.2,height=4.2)
 
 # -------------------------------------------------------------------
 # Duration against Duration/Downloads. Might show the use of myExperiment - long term vs. short term
@@ -68,7 +95,7 @@ data$duration=as.duration(data$Uploaded_date-data$Start_date) # new column
 data$duration=data$duration/84600
 data$DD=data$Downloads/as.numeric(data$duration)
 
-file3 = ggplot(data,aes(duration,DD)) +geom_point() +geom_smooth(method=lm) +xlab("Days since myExperiment Went Live") +ylab("Days / Downloads") +geom_point() +geom_smooth(method=lm) +
+file3 = ggplot(data3,aes(duration,DD)) +geom_point() +geom_smooth(method=lm) +xlab("Days since myExperiment Went Live") +ylab("Days / Downloads") +geom_point() +geom_smooth(method=lm) +
 xlab("Days since myExperiment Went Live") + ylab("Days / Downloads") + opts(title="Workflow use through time") + opts(plot.title=theme_text(size = 24, face ='bold')) + opts(panel.grid.major=theme_line(colour=NA)) + opts(panel.grid.minor=theme_line(colour=NA)) + no_bg + draw_axis + axis_labels
 
 
