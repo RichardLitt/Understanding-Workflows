@@ -76,7 +76,14 @@ for line in file.readlines():
 	output.write("\"" + myexp_d_a + "\",",)
 	output.write("\"" + ext_v + "\",",)	
 	output.write("\"" + ext_d + "\",",)	
-				
+	
+
+	#Timestamp of scrape.
+	import time
+	import datetime
+	print "\"" + str(datetime.datetime.now()) + "\",",
+	output.write("\"" + str(datetime.datetime.now()) + "\",",)
+
 	print
 	output.write("\n")
 	time.sleep(1)
