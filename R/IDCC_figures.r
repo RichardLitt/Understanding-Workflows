@@ -5,7 +5,6 @@ setwd("~/Dropbox/DataOne Workflows/IDCC-paper")
 con<-dbConnect(MySQL(),user="root",password=passwd,dbname="workflowz",host="127.0.0.1")
 
 #Update this according to your own server
-# small change
 
 draw_axis = opts(axis.line=theme_segment(colour="black",linetype="solid",size=0.8))
 axis_labels=  opts(axis.text.x=theme_text(size=11),axis.text.y=theme_text(size=11)) 
@@ -48,7 +47,7 @@ data$User_URL = sub("http://www.myexperiment.org/users/", "", c(data$User_URL))
 
 summary=count(data, c("User_URL"))
 
-file2 = ggplot(summary,aes(freq)) +geom_histogram(binwidth=10) +xlab("# of workflows contributed per user") + ylab("Frequency") + opts(title="User uploads") + opts(plot.title=theme_text(size = 24, face ='bold')) + opts(panel.grid.major=theme_line(colour=NA)) + opts(panel.grid.minor=theme_line(colour=NA)) + no_bg + draw_axis + axis_labels
+file2 = ggplot(summary,aes(freq)) +geom_histogram(binwidth=2) +xlab("# of workflows contributed per user") + ylab("Frequency") + opts(title="User uploads") + opts(plot.title=theme_text(size = 24, face ='bold')) + opts(panel.grid.major=theme_line(colour=NA)) + opts(panel.grid.minor=theme_line(colour=NA)) + no_bg + draw_axis + axis_labels
 
 ggsave(file2,file="B-all_User_URL_nchar_description.png",width=4.2,height=4.2)
 
@@ -64,7 +63,7 @@ data$User_URL = sub("http://www.myexperiment.org/users/", "", c(data$User_URL))
 
 summary=count(data, c("User_URL"))
 
-file2 = ggplot(summary,aes(freq)) +geom_histogram(binwidth=10) +xlab("# of workflows contributed per user") + ylab("Frequency") + opts(title="User uploads") + opts(plot.title=theme_text(size = 24, face ='bold')) + opts(panel.grid.major=theme_line(colour=NA)) + opts(panel.grid.minor=theme_line(colour=NA)) + no_bg + draw_axis + axis_labels
+file2 = ggplot(summary,aes(freq)) +geom_histogram(binwidth=2) +xlab("# of workflows contributed per user") + ylab("Frequency") + opts(title="User uploads") + opts(plot.title=theme_text(size = 24, face ='bold')) + opts(panel.grid.major=theme_line(colour=NA)) + opts(panel.grid.minor=theme_line(colour=NA)) + no_bg + draw_axis + axis_labels
 
 ggsave(file2,file="B-all_User_URL_nchar_description_CORE.png",width=4.2,height=4.2)
 
@@ -144,13 +143,13 @@ ggsave(file1, file="Tavernas - Bipcod vs. Downloads.png")
 # myExperiment use: attributions, credits, reviews, favourites, ratings, comments vs. downloads
 
 # All
-data1=dbGetQuery(con,"select Attributions, Credits, Favs, Ratings, Citations, Reviews, Comments, Downloads from taverna_1")
-data2=dbGetQuery(con,"select Attributions, Credits, Favs, Ratings, Citations, Reviews, Comments, Downloads from taverna_2")
-data3=dbGetQuery(con,"select Attributions, Credits, Favs, Ratings, Citations, Reviews, Comments, Downloads from rapidminer")
-data4=dbGetQuery(con,"select Attributions, Credits, Favs, Ratings, Citations, Reviews, Comments, Downloads from others")
-data_all= combine_data(data1, data2, data3, data4)
+data1=dbGetQuery(con,"select Attributions, Credits, Favs, Ratings, Citations, Reviews, Comments, Downloads, Packs_int, Groups_int from taverna_1")
+data2=dbGetQuery(con,"select Attributions, Credits, Favs, Ratings, Citations, Reviews, Comments, Downloads, Packs_int, Groups_int from taverna_2")
+data3=dbGetQuery(con,"select Attributions, Credits, Favs, Ratings, Citations, Reviews, Comments, Downloads, Packs_int, Groups_int from rapidminer")
+data4=dbGetQuery(con,"select Attributions, Credits, Favs, Ratings, Citations, Reviews, Comments, Downloads, Packs_int, Groups_int from others")
+data_all= rbind(data1, data2, data3, data4)
 
-file = ggplot(data_all,aes(Downloads,Attributions + Credits + Favs + Ratings + Citations + Reviews + Comments)) +xlab("Downloads") +ylab("Community Proxy") +geom_point() +geom_smooth(method=lm) + facet_wrap(~workflow_type) + opts(plot.title = theme_text(size = 20, face = "bold")) + opts(title = "Downloads vs. Attributions, Credits,\n Favorites, Ratings, Citations,\n Reviews & Comments")
+file = ggplot(data_all,aes(Downloads,Attributions + Credits + Favs + Ratings + Citations + Reviews + Comments + Packs_int + Groups_int)) +xlab("Downloads") +ylab("Community Proxy") +geom_point() +geom_smooth(method=lm) + facet_wrap(~workflow_type) + opts(plot.title = theme_text(size = 20, face = "bold")) + opts(title = "Downloads vs. Attributions, Credits,\n Favorites, Ratings, Citations,\n Reviews & Comments")
 ggsave(file, file="Downloads vs. Community Proxy.png")
 file
 
