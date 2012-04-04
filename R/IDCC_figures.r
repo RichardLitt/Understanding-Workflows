@@ -2,7 +2,8 @@ library(RMySQL)
 library(ggplot2) 
 library(lubridate)
 setwd("~/Dropbox/DataOne Workflows/IDCC-paper")
-con<-dbConnect(MySQL(),user="root",password=passwd,dbname="workflowz",host="127.0.0.1")
+#con<-dbConnect(MySQL(),user="root",password=passwd,dbname="workflowz",host="127.0.0.1")
+con<-dbConnect(MySQL(),user="root",password="root",dbname="myExperiment",host="127.0.0.1",port=8889)
 
 #Update this according to your own server
 
@@ -17,7 +18,7 @@ data1 = dbGetQuery(con,"select Uploaded, Updated, Versions, Views, Downloads, My
 data4 = rbind(data,data1)
 
 data4$bipcod=data4$Beanshells+data4$Inputs+data4$Processors+data4$Outputs+data4$Datalinks+data4$Coordinators
-file1 = ggplot(data4,aes(x=bipcod)) +geom_histogram(binwidth=2) +xlab("Index of complexity") + ylab("Count") + opts(title="Workflow complexity") + opts(plot.title=theme_text(size = 24, face ='bold')) + opts(panel.grid.major=theme_line(colour=NA)) + opts(panel.grid.minor=theme_line(colour=NA)) + no_bg + draw_axis + axis_labels
+file1 = ggplot(data4,aes(x=bipcod)) +geom_histogram(binwidth=2) +xlab("Index of complexity") + ylab("Count") + opts(title="Workflow complexity") + opts(plot.title=theme_text(size = 12, face ='bold')) + opts(panel.grid.major=theme_line(colour=NA)) + opts(panel.grid.minor=theme_line(colour=NA)) + no_bg + draw_axis + axis_labels
 
 
 ggsave(file1, file="A-Tavernas Histogram - Bipcod.png",width=4.2,height=4.2)
